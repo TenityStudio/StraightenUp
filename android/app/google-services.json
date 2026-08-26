@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "855338763005",
+    "project_id": "the-straight-guys",
+    "storage_bucket": "the-straight-guys.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855338763005:android:27879bb8a5585bea29f494",
+        "android_client_info": {
+          "package_name": "com.example.straight_guys"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9kNmBV5D59JE2ls9kLfielcK41x6-l18"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
