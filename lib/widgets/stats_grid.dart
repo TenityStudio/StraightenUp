@@ -26,7 +26,6 @@ class StatsGrid extends StatelessWidget {
         return Sticker(
           fill: AppColors.white,
           radius: 20,
-          shadowOffset: 4,
           padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +72,7 @@ class StatsGrid extends StatelessWidget {
               Wrap(
                 spacing: 12,
                 runSpacing: 8,
-                children: const [
+                children: [
                   _LegendDot(color: AppColors.teal, label: 'Aced'),
                   _LegendDot(color: AppColors.amber, label: 'Partial'),
                   _LegendDot(color: AppColors.coralDeep, label: 'Missed'),

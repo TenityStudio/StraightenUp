@@ -50,7 +50,7 @@ class StoryScreen extends StatelessWidget {
                                 color: AppColors.ink,
                                 letterSpacing: 1.5)),
                         const SizedBox(width: 4),
-                        const Icon(Icons.arrow_forward, size: 18, color: AppColors.ink),
+                        Icon(Icons.arrow_forward, size: 18, color: AppColors.ink),
                       ],
                     ),
                   ),
@@ -108,7 +108,7 @@ class _YelledScene extends StatelessWidget {
                   border: Border.all(color: AppColors.ink, width: 3),
                 ),
                 child: Text(
-                  'STRAIGHT GUYS!',
+                  'STRAIGHTEN UP!',
                   style: anton(size: 26, color: AppColors.cream, height: 1),
                 ),
               ),

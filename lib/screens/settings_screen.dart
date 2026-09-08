@@ -7,6 +7,16 @@ import '../models/user_settings.dart';
 import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/sticker.dart';
+import '../data/pro_exercises_seed.dart';
+import '../services/auth_service.dart';
+import '../services/exercise_history.dart';
+import '../services/remote_exercises.dart';
+import '../services/subscription_service.dart';
+import '../theme/palettes.dart';
+import 'exercise_context_screen.dart';
+import 'pro_plan_screen.dart';
+import 'pro_settings_screen.dart';
+import 'sign_in_screen.dart';
 import 'survey/survey_flow.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -65,12 +75,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(28, 20, 28, 40),
           children: [
+            AnimatedBuilder(
+              animation: SubscriptionService.instance,
+              builder: (_, _) => _ProSettingsButton(),
+            ),
+            const SizedBox(height: 24),
             _sectionTitle('Frequency'),
             const SizedBox(height: 8),
             Sticker(
               fill: AppColors.white,
               radius: 16,
-              shadowOffset: 4,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
@@ -194,6 +208,148 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     letterSpacing: 1.4,
                   )),
             ),
+            const SizedBox(height: 10),
+            StickerButton(
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ExerciseContextScreen(),
+                  ),
+                );
+              },
+              fill: AppColors.teal,
+              radius: 16,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text('TRIGGER TEST CALL + EXERCISE',
+                  style: grotesk(
+                    size: 15,
+                    weight: FontWeight.w800,
+                    color: AppColors.cream,
+                    letterSpacing: 1.4,
+                  )),
+            ),
+            const SizedBox(height: 24),
+            _sectionTitle('Pro exercises (Firestore)'),
+            const SizedBox(height: 8),
+            StickerButton(
+              onPressed: () async {
+                try {
+                  final n = await RemoteExerciseStore.instance
+                      .seedExercises(proExercisesSeed);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.ink,
+                      content: Text('$n Pro-Übungen in Firestore geschrieben.',
+                          style: grotesk(
+                              color: AppColors.cream,
+                              weight: FontWeight.w600)),
+                    ),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: AppColors.coralDeep,
+                      content: Text('Seed fehlgeschlagen: $e',
+                          style: grotesk(
+                              color: AppColors.cream,
+                              weight: FontWeight.w600)),
+                    ),
+                  );
+                }
+              },
+              fill: AppColors.purple,
+              radius: 16,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text('SEED PRO EXERCISES → FIRESTORE',
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w800,
+                    color: AppColors.cream,
+                    letterSpacing: 1.3,
+                  )),
+            ),
+            const SizedBox(height: 10),
+            StickerButton(
+              onPressed: () async {
+                await ExerciseHistory.instance.resetAll();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.ink,
+                    content: Text('Exercise-History zurückgesetzt.',
+                        style: grotesk(
+                            color: AppColors.cream, weight: FontWeight.w600)),
+                  ),
+                );
+              },
+              fill: AppColors.white,
+              radius: 16,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Text('RESET EXERCISE HISTORY',
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: 1.3,
+                  )),
+            ),
+            const SizedBox(height: 10),
+            StickerButton(
+              onPressed: () async {
+                await SubscriptionService.instance.debugLogOut();
+                if (!context.mounted) return;
+                final isPro = SubscriptionService.instance.isPro;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.ink,
+                    content: Text(
+                        'RC User reset. Pro-Status jetzt: ${isPro ? "aktiv" : "aus"}',
+                        style: grotesk(
+                            color: AppColors.cream, weight: FontWeight.w600)),
+                  ),
+                );
+              },
+              fill: AppColors.white,
+              radius: 16,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Text('RESET PRO / RC USER',
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: 1.3,
+                  )),
+            ),
+            const SizedBox(height: 10),
+            StickerButton(
+              onPressed: () async {
+                await RemoteExerciseStore.instance.refresh();
+                if (!context.mounted) return;
+                final n = RemoteExerciseStore.instance.current.length;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: AppColors.ink,
+                    content: Text('Refresh: $n Pro-Übungen aus Cloud geladen.',
+                        style: grotesk(
+                            color: AppColors.cream,
+                            weight: FontWeight.w600)),
+                  ),
+                );
+              },
+              fill: AppColors.white,
+              radius: 16,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Text('REFRESH FROM CLOUD',
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w800,
+                    color: AppColors.ink,
+                    letterSpacing: 1.3,
+                  )),
+            ),
             const SizedBox(height: 24),
             _sectionTitle('Group debug'),
             const SizedBox(height: 8),
@@ -266,7 +422,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Sticker(
       fill: AppColors.white,
       radius: 14,
-      shadowOffset: 4,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: Row(
         children: [
@@ -291,6 +446,371 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onChanged: (v) {
               if (v != null) onChanged(v);
             },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProSettingsButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isPro = SubscriptionService.instance.isPro;
+    return StickerButton(
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ProSettingsScreen()),
+      ),
+      fill: isPro ? AppColors.ink : AppColors.chipCool1,
+      radius: 18,
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isPro ? Icons.workspace_premium : Icons.lock,
+            color: isPro ? AppColors.amber : AppColors.coral,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Text('PRO SETTINGS',
+              style: grotesk(
+                size: 15,
+                color: isPro ? AppColors.cream : AppColors.textMuted,
+                weight: FontWeight.w800,
+                letterSpacing: 1.8,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountCard extends StatelessWidget {
+  Future<void> _editName(BuildContext context) async {
+    final controller = TextEditingController(
+        text: AuthService.instance.displayName ?? '');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (d) => AlertDialog(
+        backgroundColor: AppColors.cream,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.ink, width: 2.5),
+        ),
+        title: Text('Your name', style: anton(size: 22, height: 1)),
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.ink, width: 2),
+          ),
+          child: TextField(
+            controller: controller,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            style: grotesk(size: 15, weight: FontWeight.w700),
+            cursorColor: AppColors.coral,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Wie sollen wir dich nennen?',
+              hintStyle: grotesk(
+                size: 15,
+                color: AppColors.textFaint,
+                weight: FontWeight.w500,
+              ),
+            ),
+            onSubmitted: (v) => Navigator.pop(d, v.trim()),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(d, null),
+            child: Text('Cancel',
+                style: grotesk(color: AppColors.textFaint)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(d, controller.text.trim()),
+            child: Text('Save',
+                style: grotesk(
+                    color: AppColors.coral, weight: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    if (result == null || !context.mounted) return;
+    if (result.isEmpty) return;
+    try {
+      await AuthService.instance.setDisplayName(result);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.ink,
+          content: Text('Name gespeichert.',
+              style:
+                  grotesk(color: AppColors.cream, weight: FontWeight.w600)),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.coralDeep,
+          content: Text('Konnte nicht speichern: $e',
+              style:
+                  grotesk(color: AppColors.cream, weight: FontWeight.w600)),
+        ),
+      );
+    }
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (d) => AlertDialog(
+        backgroundColor: AppColors.cream,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.ink, width: 2.5),
+        ),
+        title: Text('Sign out?', style: anton(size: 22, height: 1)),
+        content: Text(
+          'Du bleibst in der App als Gast. Ohne Anmeldung geht dein Pro-Abo '
+          'bei Reinstall / Handywechsel verloren.',
+          style: grotesk(size: 13, color: AppColors.textMuted, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(d, false),
+            child: Text('Cancel',
+                style: grotesk(color: AppColors.textFaint)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(d, true),
+            child: Text('Sign out',
+                style: grotesk(
+                    color: AppColors.coralDeep, weight: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    await AuthService.instance.signOutToAnonymous();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = AuthService.instance;
+    final signedIn = auth.hasRealAccount;
+    final verified = auth.emailVerified;
+    final email = auth.email;
+    final name = auth.displayName;
+
+    final String kicker_text;
+    final Color kickerColor;
+    final Color iconBg;
+    final IconData iconData;
+    final String status;
+    if (!signedIn) {
+      kicker_text = 'GUEST MODE';
+      kickerColor = AppColors.textFaint;
+      iconBg = AppColors.amber;
+      iconData = Icons.person_outline;
+      status = name ?? 'Sign in to save progress';
+    } else if (!verified) {
+      kicker_text = 'VERIFY EMAIL';
+      kickerColor = AppColors.coral;
+      iconBg = AppColors.coral;
+      iconData = Icons.mark_email_unread;
+      status = (name?.isNotEmpty ?? false) ? '$name  ·  $email' : (email ?? 'You');
+    } else {
+      kicker_text = 'SIGNED IN';
+      kickerColor = AppColors.teal;
+      iconBg = AppColors.teal;
+      iconData = Icons.check;
+      status = (name?.isNotEmpty ?? false) ? '$name  ·  $email' : (email ?? 'You');
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
+      decoration: BoxDecoration(
+        color: signedIn ? AppColors.white : AppColors.chipCool1,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.ink, width: 2.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.ink, width: 2),
+            ),
+            child: Icon(iconData,
+                color: signedIn ? AppColors.cream : AppColors.ink, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(kicker_text,
+                    style: kicker(color: kickerColor, letterSpacing: 1.7)),
+                const SizedBox(height: 3),
+                Text(
+                  status,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (!signedIn) {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SignInScreen()),
+                );
+              } else if (!verified) {
+                // Verify-Flow nochmal öffnen
+                await Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SignInScreen()),
+                );
+              } else {
+                await _signOut(context);
+              }
+            },
+            child: Text(
+              !signedIn ? 'Sign in' : (!verified ? 'Verify' : 'Sign out'),
+              style: grotesk(
+                size: 13,
+                color: !verified ? AppColors.coral : AppColors.textMuted,
+                weight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ThemePickerRow extends StatelessWidget {
+  final Palette current;
+  final ValueChanged<Palette> onPick;
+  const _ThemePickerRow({required this.current, required this.onPick});
+
+  @override
+  Widget build(BuildContext context) {
+    final row1 = allPalettes.take(5).toList();
+    final row2 = allPalettes.skip(5).take(5).toList();
+    return Column(
+      children: [
+        _row(row1),
+        const SizedBox(height: 12),
+        _row(row2),
+      ],
+    );
+  }
+
+  Widget _row(List<Palette> items) {
+    return Row(
+      children: [
+        for (int i = 0; i < items.length; i++) ...[
+          Expanded(child: _tile(items[i])),
+          if (i != items.length - 1) const SizedBox(width: 8),
+        ],
+      ],
+    );
+  }
+
+  Widget _tile(Palette p) {
+    final selected = p.id == current.id;
+    return GestureDetector(
+      onTap: () => onPick(p),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                color: p.cream,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: p.ink,
+                  width: selected ? 3 : 1.8,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 5,
+                    bottom: 5,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: p.coral,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: p.ink, width: 1.2),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: Container(
+                      width: 11,
+                      height: 11,
+                      decoration: BoxDecoration(
+                        color: p.amber,
+                        borderRadius: BorderRadius.circular(3),
+                        border: Border.all(color: p.ink, width: 1.2),
+                      ),
+                    ),
+                  ),
+                  if (selected)
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: p.ink,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.check,
+                              color: p.cream, size: 11),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            p.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: grotesk(
+              size: 9,
+              weight: selected ? FontWeight.w800 : FontWeight.w600,
+              color: selected ? AppColors.ink : AppColors.textFaint,
+            ),
           ),
         ],
       ),

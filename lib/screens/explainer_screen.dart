@@ -30,21 +30,21 @@ class ExplainerScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 34),
-              const _StepCard(
+              _StepCard(
                 chipColor: AppColors.chipCool1,
                 icon: Icons.access_time,
                 title: 'A random moment',
                 body: "Any time of day. You never see it coming.",
               ),
               const SizedBox(height: 18),
-              const _StepCard(
+              _StepCard(
                 chipColor: AppColors.chipCool2,
                 icon: Icons.notifications_none,
                 title: 'Your phone yells',
-                body: 'A push notification shouts STRAIGHT GUYS.',
+                body: 'A push notification shouts STRAIGHTEN UP.',
               ),
               const SizedBox(height: 18),
-              const _StepCard(
+              _StepCard(
                 chipColor: AppColors.chipCool3,
                 icon: Icons.check,
                 title: 'You sit up & tap',

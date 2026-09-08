@@ -16,8 +16,8 @@ class NotificationService {
   bool _initialized = false;
 
   static const _channelId = 'straight_guys_channel';
-  static const _channelName = 'STRAIGHT GUYS Reminders';
-  static const _promptTitle = 'STRAIGHT GUYS!';
+  static const _channelName = 'Straighten Up! Reminders';
+  static const _promptTitle = 'STRAIGHTEN UP!';
   static const _promptBody = 'Sitz gerade. Kopf hoch. Schultern zurück.';
 
   /// Payload-Marker, damit wir bei Notification-Tap wissen: das war ein Call.

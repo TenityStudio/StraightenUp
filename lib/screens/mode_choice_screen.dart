@@ -39,7 +39,6 @@ class ModeChoiceScreen extends StatelessWidget {
                 onPressed: () => onChoose(AppMode.solo),
                 fill: AppColors.coral,
                 radius: 22,
-                shadowOffset: 6,
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

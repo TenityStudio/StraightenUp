@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'palettes.dart';
+
+/// Farbaliase — greifen dynamisch auf das aktuell aktive Palette-Objekt zu.
+/// Alte const-Nutzungen sind auf Getter umgestellt worden, damit ein Palette-
+/// Wechsel zur Laufzeit sofort greift (via ThemeStore + AnimatedBuilder in main).
 class AppColors {
-  static const cream = Color(0xFFFBF4EA);
-  static const ink = Color(0xFF211A12);
-  static const coral = Color(0xFFFF5A3C);
-  static const coralDeep = Color(0xFFFF3B21);
-  static const amber = Color(0xFFFFB020);
-  static const teal = Color(0xFF2E7D6B);
-  static const purple = Color(0xFF7A5CC4);
-  static const bronze = Color(0xFFC98A2E);
-  static const white = Color(0xFFFFFFFF);
+  static Palette get _p => ThemeStore.instance.current;
 
-  static const textMuted = Color(0xFF6A5E4E);
-  static const textFaint = Color(0xFF9A8E7C);
-  static const textDark = Color(0xFF4A4034);
-  static const textOnDark = Color(0xFFFBF4EA);
+  static Color get cream => _p.cream;
+  static Color get ink => _p.ink;
+  static Color get coral => _p.coral;
+  static Color get coralDeep => _p.coralDeep;
+  static Color get amber => _p.amber;
+  static Color get teal => _p.teal;
+  static Color get purple => _p.purple;
+  static Color get bronze => _p.bronze;
+  static Color get white => _p.white;
 
-  static const chipCool1 = Color(0xFFFFF0DA);
-  static const chipCool2 = Color(0xFFFFE2D6);
-  static const chipCool3 = Color(0xFFFFF3D2);
+  static Color get textMuted => _p.textMuted;
+  static Color get textFaint => _p.textFaint;
+  static Color get textDark => _p.textDark;
+  static Color get textOnDark => _p.textOnDark;
 
-  static const shadowWarm = Color(0xFFE5B270);
-  static const dashedDivider = Color(0xFFEDE0C8);
+  static Color get chipCool1 => _p.chipCool1;
+  static Color get chipCool2 => _p.chipCool2;
+  static Color get chipCool3 => _p.chipCool3;
+
+  static Color get shadowWarm => _p.shadowWarm;
+  static Color get dashedDivider => _p.dashedDivider;
 }
 
 ThemeData buildAppTheme() {
@@ -40,7 +47,7 @@ ThemeData buildAppTheme() {
       bodyColor: AppColors.ink,
       displayColor: AppColors.ink,
     ),
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       backgroundColor: AppColors.cream,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
@@ -53,13 +60,13 @@ ThemeData buildAppTheme() {
 
 TextStyle anton({
   double size = 34,
-  Color color = AppColors.ink,
+  Color? color,
   double height = 0.98,
   double letterSpacing = 0.4,
 }) =>
     GoogleFonts.anton(
       fontSize: size,
-      color: color,
+      color: color ?? AppColors.ink,
       height: height,
       letterSpacing: letterSpacing,
     );
@@ -67,27 +74,27 @@ TextStyle anton({
 TextStyle grotesk({
   double size = 15,
   FontWeight weight = FontWeight.w500,
-  Color color = AppColors.ink,
+  Color? color,
   double height = 1.35,
   double letterSpacing = 0,
 }) =>
     GoogleFonts.spaceGrotesk(
       fontSize: size,
       fontWeight: weight,
-      color: color,
+      color: color ?? AppColors.ink,
       height: height,
       letterSpacing: letterSpacing,
     );
 
 TextStyle kicker({
-  Color color = AppColors.bronze,
+  Color? color,
   double letterSpacing = 3.5,
   double size = 12,
 }) =>
     GoogleFonts.spaceGrotesk(
       fontSize: size,
       fontWeight: FontWeight.w600,
-      color: color,
+      color: color ?? AppColors.bronze,
       letterSpacing: letterSpacing,
       height: 1,
     );

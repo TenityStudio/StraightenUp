@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/lobby.dart';
 import '../models/user_settings.dart';
 import '../theme/app_theme.dart';
+import '../theme/palettes.dart';
 import 'group_mode_screen.dart';
 import 'home_screen.dart';
 import 'settings_screen.dart';
@@ -20,9 +21,25 @@ class _MainShellState extends State<MainShell> {
   late int _tab = widget.initialTab;
 
   @override
+  void initState() {
+    super.initState();
+    ThemeStore.instance.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    ThemeStore.instance.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final pages = [
-      const GroupModeScreen(),
+      GroupModeScreen(),
       HomeScreen(settings: widget.settings),
       SettingsScreen(settings: widget.settings),
     ];
@@ -56,7 +73,6 @@ class _StickerNavBar extends StatelessWidget {
     final middleIcon = inLobby ? Icons.groups_2 : Icons.bolt;
     final middleLabel = inLobby ? 'Group' : 'Solo';
     final accent = inLobby ? AppColors.purple : AppColors.coral;
-    final shadow = inLobby ? AppColors.purple : AppColors.shadowWarm;
 
     final items = [
       (Icons.groups_2_outlined, 'Lobby'),
@@ -70,14 +86,7 @@ class _StickerNavBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.ink,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: AppColors.ink, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: shadow,
-              offset: const Offset(5, 5),
-              blurRadius: 0,
-            ),
-          ],
+          border: Border.all(color: AppColors.ink, width: 2.5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Row(

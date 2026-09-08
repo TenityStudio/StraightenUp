@@ -12,19 +12,30 @@ class CallEntry {
   final CallResult result;
   final int responseSeconds;
   final AppMode mode;
+  final String? exerciseId;
 
   CallEntry({
     required this.time,
     required this.result,
     required this.responseSeconds,
     this.mode = AppMode.solo,
+    this.exerciseId,
   });
+
+  CallEntry copyWith({String? exerciseId}) => CallEntry(
+        time: time,
+        result: result,
+        responseSeconds: responseSeconds,
+        mode: mode,
+        exerciseId: exerciseId ?? this.exerciseId,
+      );
 
   Map<String, dynamic> toJson() => {
         't': time.toIso8601String(),
         'r': result.name,
         's': responseSeconds,
         'm': mode.name,
+        if (exerciseId != null) 'e': exerciseId,
       };
 
   static CallEntry fromJson(Map<String, dynamic> j) => CallEntry(
@@ -35,6 +46,7 @@ class CallEntry {
           (e) => e.name == (j['m'] as String? ?? 'solo'),
           orElse: () => AppMode.solo,
         ),
+        exerciseId: j['e'] as String?,
       );
 
   String get hhmm =>
@@ -117,6 +129,21 @@ class CallLog extends ChangeNotifier {
       if (aced == dayEntries.length) return DaySummary(day, DayStatus.allAced);
       return DaySummary(day, DayStatus.partial);
     });
+  }
+
+  /// Setzt die Übungs-ID am letzten Aced-Eintrag von heute.
+  Future<void> attachExerciseToLastAced(String exerciseId) async {
+    final now = DateTime.now();
+    for (int i = _entries.length - 1; i >= 0; i--) {
+      final e = _entries[i];
+      if (!_sameDay(e.time, now)) break;
+      if (e.result == CallResult.aced) {
+        _entries[i] = e.copyWith(exerciseId: exerciseId);
+        await _persist();
+        notifyListeners();
+        return;
+      }
+    }
   }
 
   Future<void> add(CallEntry entry) async {

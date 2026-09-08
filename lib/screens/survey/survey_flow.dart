@@ -496,7 +496,7 @@ class _PainQuestionState extends State<PainQuestion> {
                             border: Border.all(color: AppColors.ink, width: 2),
                           ),
                           child: selected
-                              ? const Icon(Icons.check,
+                              ? Icon(Icons.check,
                                   size: 16, color: AppColors.cream)
                               : null,
                         ),

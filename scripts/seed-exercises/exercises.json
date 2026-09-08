@@ -1,0 +1,48 @@
+[
+  {
+    "id": "pro_neck_isometric_press",
+    "title": "Isometric Neck Press",
+    "subtitle": "Kraft ohne sichtbare Bewegung.",
+    "steps": [
+      "Handfläche flach an die Stirn legen.",
+      "Kopf drückt gegen die Hand, Hand hält gegen — kein Nachgeben.",
+      "10 Sekunden halten, dabei ruhig atmen.",
+      "Wiederholen: Hinterkopf, linke Schläfe, rechte Schläfe."
+    ],
+    "seconds": 45,
+    "context": "transit",
+    "locations": ["transit", "office", "home"],
+    "bodyParts": ["neck"],
+    "type": "strength",
+    "intensity": "medium",
+    "equipment": ["none"],
+    "discreet": true,
+    "tags": ["gamer-neck", "quick-fix"],
+    "benefit": "Kräftigt die tiefen Halsbeuger — perfekt am Schreibtisch.",
+    "isPro": true,
+    "week": 1
+  },
+  {
+    "id": "pro_seated_spinal_twist",
+    "title": "Seated Spinal Twist",
+    "subtitle": "Rücken entdrehen im Stuhl.",
+    "steps": [
+      "Aufrecht sitzen, Füße flach auf dem Boden.",
+      "Rechte Hand außen ans linke Knie.",
+      "Sanft nach links drehen und tief atmen.",
+      "15 Sekunden halten, dann Seite wechseln."
+    ],
+    "seconds": 40,
+    "context": "office",
+    "locations": ["office", "home"],
+    "bodyParts": ["spine", "lower_back"],
+    "type": "mobility",
+    "intensity": "easy",
+    "equipment": ["chair"],
+    "discreet": true,
+    "tags": ["desk-reset", "office"],
+    "benefit": "Löst Verspannung im mittleren Rücken vom langen Sitzen.",
+    "isPro": true,
+    "week": 1
+  }
+]

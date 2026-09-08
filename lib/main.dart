@@ -14,8 +14,12 @@ import 'screens/onboarding_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/auth_service.dart';
 import 'services/fcm_service.dart';
+import 'services/exercise_history.dart';
 import 'services/notification_service.dart';
+import 'services/remote_exercises.dart';
+import 'services/subscription_service.dart';
 import 'theme/app_theme.dart';
+import 'theme/palettes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +31,7 @@ Future<void> main() async {
   );
   // Kritisch für UI (schnell, rein lokal):
   final settings = await UserSettings.load();
+  await ThemeStore.init();
   await CallLog.init();
   await SurveyStore.init();
 
@@ -38,6 +43,9 @@ Future<void> main() async {
   );
   unawaited(AuthService.instance.init());
   await LobbyStore.init(); // legt nur die Instanz an, Restore läuft async
+  await RemoteExerciseStore.init(); // cached sofort, refreshed async
+  await ExerciseHistory.init();
+  unawaited(SubscriptionService.instance.init()); // still-fail wenn nicht konfiguriert
   unawaited(NotificationService.instance.init());
   unawaited(FcmService.instance.init());
 
@@ -50,11 +58,14 @@ class StraightGuysApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Straight Guys',
-      debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
-      home: _ColdStartSplash(settings: settings),
+    return AnimatedBuilder(
+      animation: ThemeStore.instance,
+      builder: (_, _) => MaterialApp(
+        title: 'Straighten Up!',
+        debugShowCheckedModeBanner: false,
+        theme: buildAppTheme(),
+        home: _ColdStartSplash(settings: settings),
+      ),
     );
   }
 }

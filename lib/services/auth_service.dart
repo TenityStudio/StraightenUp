@@ -20,6 +20,12 @@ class AuthService extends ChangeNotifier {
   User? get user => _user;
   String? get uid => _user?.uid;
   bool get signedIn => _user != null;
+  bool get isAnonymous => _user?.isAnonymous ?? true;
+  bool get hasRealAccount => _user != null && !_user!.isAnonymous;
+  bool get emailVerified => _user?.emailVerified ?? false;
+  /// True nur wenn echter Account UND Email verifiziert.
+  bool get isFullyVerified => hasRealAccount && emailVerified;
+  String? get email => _user?.email;
 
   Future<void> init() async {
     _auth.authStateChanges().listen((u) {
@@ -64,11 +70,93 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  String? get displayName => _user?.displayName;
+
   Future<void> setDisplayName(String name) async {
+    final u = _user;
+    if (u != null) {
+      await u.updateDisplayName(name);
+      // Reload damit displayName im _user aktualisiert ist.
+      await u.reload();
+      _user = _auth.currentUser;
+    }
     await userDoc.set({'displayName': name}, SetOptions(merge: true));
+    notifyListeners();
   }
 
   Future<void> setFcmToken(String? token) async {
     await userDoc.set({'fcmToken': token}, SetOptions(merge: true));
+  }
+
+  // ─── Account-Management ───────────────────────────────────────────────────
+
+  /// Legt einen echten Email/Password-Account an und verknüpft ihn mit dem
+  /// aktuellen anonymen User — Daten (Firestore-Docs) bleiben erhalten.
+  /// Schickt direkt danach eine Verifizierungs-Mail.
+  Future<void> signUpWithEmail(String email, String password) async {
+    final current = _user;
+    if (current != null && current.isAnonymous) {
+      // Upgrade des anonymen Accounts → gleiche UID, alle Daten bleiben.
+      final credential =
+          EmailAuthProvider.credential(email: email, password: password);
+      final userCred = await current.linkWithCredential(credential);
+      _user = userCred.user;
+    } else {
+      final userCred = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      _user = userCred.user;
+    }
+    await _ensureUserDoc();
+    await userDoc.set({'anonymous': false, 'email': email},
+        SetOptions(merge: true));
+    // Verifizierungs-Mail schicken (nicht fatal wenn's fehlschlägt).
+    try {
+      await _user?.sendEmailVerification();
+    } catch (e) {
+      debugPrint('sendEmailVerification failed: $e');
+    }
+    notifyListeners();
+  }
+
+  /// Verifizierungs-Mail erneut schicken.
+  Future<void> resendVerificationEmail() async {
+    final u = _user;
+    if (u == null || u.emailVerified) return;
+    await u.sendEmailVerification();
+  }
+
+  /// Läd den User-State neu (um `emailVerified` nach Klick auf den Mail-Link
+  /// zu aktualisieren). Gibt true zurück wenn jetzt verifiziert.
+  Future<bool> refreshVerificationStatus() async {
+    final u = _user;
+    if (u == null) return false;
+    await u.reload();
+    _user = _auth.currentUser;
+    notifyListeners();
+    return _user?.emailVerified ?? false;
+  }
+
+  /// Meldet einen existierenden Account an. Verwirft die aktuelle anonyme
+  /// Session (die Daten der Anonymen bleiben in Firestore, sind aber nicht
+  /// mehr aus der App erreichbar).
+  Future<void> signInWithEmail(String email, String password) async {
+    final userCred = await _auth.signInWithEmailAndPassword(
+        email: email, password: password);
+    _user = userCred.user;
+    await _ensureUserDoc();
+    notifyListeners();
+  }
+
+  /// Password-Reset-Mail schicken.
+  Future<void> sendPasswordReset(String email) =>
+      _auth.sendPasswordResetEmail(email: email);
+
+  /// Ausloggen → zurück zu anonymem Modus (neue UID).
+  Future<void> signOutToAnonymous() async {
+    await _auth.signOut();
+    final cred = await _auth.signInAnonymously();
+    _user = cred.user;
+    await _ensureUserDoc();
+    notifyListeners();
   }
 }

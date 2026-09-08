@@ -87,7 +87,7 @@ class _StraightGuysHero extends StatelessWidget {
       height: 0.95,
       letterSpacing: 0.4,
     ).copyWith(
-      shadows: const [
+      shadows: [
         Shadow(offset: Offset(5, 6), blurRadius: 0, color: AppColors.ink),
       ],
     );
@@ -96,8 +96,8 @@ class _StraightGuysHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('STRAIGHT', style: style, textAlign: TextAlign.center),
-          Text('GUYS!', style: style, textAlign: TextAlign.center),
+          Text('STRAIGHTEN', style: style, textAlign: TextAlign.center),
+          Text('UP!', style: style, textAlign: TextAlign.center),
         ],
       ),
     );

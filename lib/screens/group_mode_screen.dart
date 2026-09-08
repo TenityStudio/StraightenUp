@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../models/lobby.dart';
 import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/palettes.dart';
 import '../widgets/sticker.dart';
 
 class GroupModeScreen extends StatelessWidget {
@@ -17,10 +18,11 @@ class GroupModeScreen extends StatelessWidget {
       backgroundColor: AppColors.cream,
       body: SafeArea(
         child: AnimatedBuilder(
-          animation: LobbyStore.instance,
+          animation: Listenable.merge(
+              [LobbyStore.instance, ThemeStore.instance]),
           builder: (_, _) => LobbyStore.instance.inLobby
-              ? const _InLobbyView()
-              : const _NoLobbyView(),
+              ? _InLobbyView()
+              : _NoLobbyView(),
         ),
       ),
     );
@@ -57,7 +59,6 @@ class _NoLobbyView extends StatelessWidget {
             ),
             fill: AppColors.coral,
             radius: 22,
-            shadowOffset: 6,
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 22),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +530,7 @@ class _InLobbyViewState extends State<_InLobbyView> {
         backgroundColor: AppColors.cream,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.ink, width: 3),
+          side: BorderSide(color: AppColors.ink, width: 3),
         ),
         title: Text('Close lobby?', style: anton(size: 26, height: 1)),
         content: Text(
@@ -725,13 +726,6 @@ class _InviteChip extends StatelessWidget {
           color: AppColors.amber,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.ink, width: 2.5),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.ink,
-              offset: Offset(3, 3),
-              blurRadius: 0,
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -770,7 +764,6 @@ class _RhythmCard extends StatelessWidget {
     return Sticker(
       fill: AppColors.white,
       radius: 16,
-      shadowOffset: 4,
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       child: Row(
         children: [
@@ -781,7 +774,7 @@ class _RhythmCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.ink, width: 2),
             ),
-            child: const Icon(Icons.schedule, color: AppColors.ink, size: 24),
+            child: Icon(Icons.schedule, color: AppColors.ink, size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -908,13 +901,6 @@ class _SummonRow extends StatelessWidget {
           color: active ? AppColors.ink : AppColors.dashedDivider,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.ink, width: 2.5),
-          boxShadow: [
-            BoxShadow(
-              color: active ? AppColors.coral : AppColors.ink,
-              offset: const Offset(4, 4),
-              blurRadius: 0,
-            ),
-          ],
         ),
         child: Row(
           children: [
@@ -1134,7 +1120,6 @@ class _PasswordToggle extends StatelessWidget {
     return Sticker(
       fill: AppColors.white,
       radius: 14,
-      shadowOffset: 4,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
@@ -1189,7 +1174,7 @@ class _CodeStatusHint extends StatelessWidget {
         padding: const EdgeInsets.only(left: 4, top: 4),
         child: Row(
           children: [
-            const Icon(Icons.lock, size: 14, color: AppColors.coral),
+            Icon(Icons.lock, size: 14, color: AppColors.coral),
             const SizedBox(width: 6),
             Text('This lobby requires a password.',
                 style: grotesk(
@@ -1263,7 +1248,6 @@ class _FrequencyRow extends StatelessWidget {
     return Sticker(
       fill: AppColors.white,
       radius: 16,
-      shadowOffset: 4,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
@@ -1309,7 +1293,6 @@ class _HourField extends StatelessWidget {
     return Sticker(
       fill: AppColors.white,
       radius: 14,
-      shadowOffset: 4,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: Row(
         children: [

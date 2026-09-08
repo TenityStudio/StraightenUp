@@ -5,8 +5,8 @@ import '../theme/app_theme.dart';
 /// Basis-Sticker: farbige Fläche mit dickem Ink-Outline und hartem Offset-Shadow.
 class Sticker extends StatelessWidget {
   final Widget child;
-  final Color fill;
-  final Color shadowColor;
+  final Color? fill;
+  final Color? shadowColor;
   final double borderWidth;
   final double radius;
   final double shadowOffset;
@@ -16,11 +16,11 @@ class Sticker extends StatelessWidget {
   const Sticker({
     super.key,
     required this.child,
-    this.fill = AppColors.white,
-    this.shadowColor = AppColors.ink,
-    this.borderWidth = 3,
+    this.fill,
+    this.shadowColor,
+    this.borderWidth = 2.5,
     this.radius = 20,
-    this.shadowOffset = 5,
+    this.shadowOffset = 0,
     this.padding,
     this.border,
   });
@@ -28,10 +28,12 @@ class Sticker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = BorderRadius.circular(radius);
+    final bg = fill ?? AppColors.white;
+    final shadow = shadowColor ?? AppColors.ink;
     final body = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: fill,
+        color: bg,
         borderRadius: r,
         border: border ?? Border.all(color: AppColors.ink, width: borderWidth),
       ),
@@ -46,7 +48,7 @@ class Sticker extends StatelessWidget {
           right: -shadowOffset,
           bottom: -shadowOffset,
           child: Container(
-            decoration: BoxDecoration(color: shadowColor, borderRadius: r),
+            decoration: BoxDecoration(color: shadow, borderRadius: r),
           ),
         ),
         body,
@@ -60,8 +62,8 @@ class Sticker extends StatelessWidget {
 class StickerButton extends StatefulWidget {
   final Widget child;
   final VoidCallback? onPressed;
-  final Color fill;
-  final Color shadowColor;
+  final Color? fill;
+  final Color? shadowColor;
   final double radius;
   final double shadowOffset;
   final double borderWidth;
@@ -72,11 +74,11 @@ class StickerButton extends StatefulWidget {
     super.key,
     required this.child,
     required this.onPressed,
-    this.fill = AppColors.coral,
-    this.shadowColor = AppColors.ink,
+    this.fill,
+    this.shadowColor,
     this.radius = 16,
-    this.shadowOffset = 5,
-    this.borderWidth = 3,
+    this.shadowOffset = 0,
+    this.borderWidth = 2.5,
     this.padding = const EdgeInsets.symmetric(vertical: 17, horizontal: 24),
     this.expand = true,
   });
@@ -100,8 +102,8 @@ class _StickerButtonState extends State<StickerButton> {
       duration: const Duration(milliseconds: 60),
       transform: Matrix4.translationValues(off, off, 0),
       child: Sticker(
-        fill: widget.fill,
-        shadowColor: widget.shadowColor,
+        fill: widget.fill ?? AppColors.coral,
+        shadowColor: widget.shadowColor ?? AppColors.ink,
         radius: widget.radius,
         shadowOffset: _pressed ? 0 : widget.shadowOffset,
         borderWidth: widget.borderWidth,
@@ -124,13 +126,13 @@ class _StickerButtonState extends State<StickerButton> {
 /// Kleine dunkle Pille mit farbigem Text (z.B. „THE ORIGIN · 01").
 class KickerPill extends StatelessWidget {
   final String text;
-  final Color background;
-  final Color foreground;
+  final Color? background;
+  final Color? foreground;
   const KickerPill({
     super.key,
     required this.text,
-    this.background = AppColors.ink,
-    this.foreground = AppColors.amber,
+    this.background,
+    this.foreground,
   });
 
   @override
@@ -138,12 +140,12 @@ class KickerPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: background,
+        color: background ?? AppColors.ink,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         text.toUpperCase(),
-        style: kicker(color: foreground, letterSpacing: 1.7),
+        style: kicker(color: foreground ?? AppColors.amber, letterSpacing: 1.7),
       ),
     );
   }
@@ -153,14 +155,14 @@ class KickerPill extends StatelessWidget {
 class OutlineChip extends StatelessWidget {
   final String label;
   final Color fill;
-  final Color textColor;
-  final Color borderColor;
+  final Color? textColor;
+  final Color? borderColor;
   const OutlineChip({
     super.key,
     required this.label,
     this.fill = Colors.transparent,
-    this.textColor = AppColors.ink,
-    this.borderColor = AppColors.ink,
+    this.textColor,
+    this.borderColor,
   });
 
   @override
@@ -170,11 +172,14 @@ class OutlineChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: fill,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor, width: 2.5),
+        border: Border.all(color: borderColor ?? AppColors.ink, width: 2.5),
       ),
       child: Text(
         label,
-        style: grotesk(size: 15, weight: FontWeight.w700, color: textColor),
+        style: grotesk(
+            size: 15,
+            weight: FontWeight.w700,
+            color: textColor ?? AppColors.ink),
       ),
     );
   }

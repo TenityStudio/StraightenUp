@@ -103,7 +103,6 @@ class _BigStat extends StatelessWidget {
     return Sticker(
       fill: fill,
       radius: 20,
-      shadowOffset: 4,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
