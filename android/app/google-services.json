@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:855338763005:android:27879bb8a5585bea29f494",
+        "mobilesdk_app_id": "1:855338763005:android:b04ffbabffe5699329f494",
         "android_client_info": {
-          "package_name": "com.example.straight_guys"
+          "package_name": "com.tenitystudio.straightenup"
         }
       },
       "oauth_client": [],

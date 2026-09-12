@@ -59,6 +59,50 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
+
+# ─── App-Icons (Generation via: dart run flutter_launcher_icons) ─────────────
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  # Bild wird für Android + iOS als App-Icon verwendet.
+  image_path: "assets/app_icon.png"
+
+  # Android Adaptive Icons: Foreground = Figur, Background = Coral-Farbe.
+  # (Aktuell nutzen wir das gleiche Bild als Foreground — bei Bedarf später
+  # ein transparentes Foreground-PNG bereitstellen.)
+  adaptive_icon_background: "#FF5A3C"
+  adaptive_icon_foreground: "assets/app_icon.png"
+
+  # Web / Windows / macOS aus, weil nicht relevant für Mobile-Launch.
+  web:
+    generate: false
+  windows:
+    generate: false
+  macos:
+    generate: false
+
+  # iOS: transparente Bereiche entfernen (Apple lehnt sonst ab).
+  remove_alpha_ios: true
+
+# ─── Splash Screen (Generation via: dart run flutter_native_splash:create) ───
+flutter_native_splash:
+  color: "#FF5A3C"
+  image: "assets/app_icon.png"
+  color_dark: "#211A12"
+  image_dark: "assets/app_icon.png"
+
+  android_12:
+    color: "#FF5A3C"
+    image: "assets/app_icon.png"
+    color_dark: "#211A12"
+    image_dark: "assets/app_icon.png"
+
+  # iOS 15+ nutzt das Storyboard-Splash — kein Extra-Setup nötig.
+  ios: true
+  android: true
+  web: false
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

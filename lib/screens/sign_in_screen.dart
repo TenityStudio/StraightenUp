@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../config/legal_urls.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/sticker.dart';
@@ -202,6 +205,10 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
             ),
+            if (_signUp) ...[
+              const SizedBox(height: 12),
+              _LegalConsentText(),
+            ],
             const SizedBox(height: 10),
             if (!_signUp)
               TextButton(
@@ -386,6 +393,55 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Kurzer Hinweis unter dem "Create Account"-Button dass der User mit dem
+/// Sign-Up unseren Privacy Policy und dem Impressum zustimmt.
+class _LegalConsentText extends StatelessWidget {
+  Future<void> _open(String url) async {
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final baseStyle = grotesk(
+      size: 12,
+      color: AppColors.textFaint,
+      weight: FontWeight.w500,
+      height: 1.4,
+    );
+    final linkStyle = grotesk(
+      size: 12,
+      color: AppColors.coral,
+      weight: FontWeight.w700,
+      height: 1.4,
+    );
+    return Text.rich(
+      TextSpan(
+        style: baseStyle,
+        children: [
+          const TextSpan(
+              text: 'Mit dem Erstellen eines Accounts stimmst du unserer '),
+          TextSpan(
+            text: 'Datenschutzerklärung',
+            style: linkStyle,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => _open(LegalUrls.privacyPolicy),
+          ),
+          const TextSpan(text: ' zu und akzeptierst das '),
+          TextSpan(
+            text: 'Impressum',
+            style: linkStyle,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => _open(LegalUrls.impressum),
+          ),
+          const TextSpan(text: '.'),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

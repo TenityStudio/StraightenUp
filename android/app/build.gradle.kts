@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.straight_guys"
+    namespace = "com.tenitystudio.straightenup"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.straight_guys"
+        applicationId = "com.tenitystudio.straightenup"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         multiDexEnabled = true

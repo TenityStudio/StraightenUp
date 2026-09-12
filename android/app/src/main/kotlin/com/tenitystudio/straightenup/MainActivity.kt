@@ -1,4 +1,4 @@
-package com.example.straight_guys
+package com.tenitystudio.straightenup
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD9kNmBV5D59JE2ls9kLfielcK41x6-l18',
-    appId: '1:855338763005:android:27879bb8a5585bea29f494',
+    appId: '1:855338763005:android:b04ffbabffe5699329f494',
     messagingSenderId: '855338763005',
     projectId: 'the-straight-guys',
     storageBucket: 'the-straight-guys.firebasestorage.app',
@@ -60,20 +60,20 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAb0VNtoq5Y5UyTld1xVQ5aalWHvbQKtAM',
-    appId: '1:855338763005:ios:9e2b8901497040b229f494',
+    appId: '1:855338763005:ios:ec9521e29bd84efb29f494',
     messagingSenderId: '855338763005',
     projectId: 'the-straight-guys',
     storageBucket: 'the-straight-guys.firebasestorage.app',
-    iosBundleId: 'com.example.straightGuys',
+    iosBundleId: 'com.tenitystudio.straightenup',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAb0VNtoq5Y5UyTld1xVQ5aalWHvbQKtAM',
-    appId: '1:855338763005:ios:9e2b8901497040b229f494',
+    appId: '1:855338763005:ios:ec9521e29bd84efb29f494',
     messagingSenderId: '855338763005',
     projectId: 'the-straight-guys',
     storageBucket: 'the-straight-guys.firebasestorage.app',
-    iosBundleId: 'com.example.straightGuys',
+    iosBundleId: 'com.tenitystudio.straightenup',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

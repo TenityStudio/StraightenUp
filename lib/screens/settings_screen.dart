@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/call_log.dart';
 import '../models/lobby.dart';
@@ -7,6 +8,7 @@ import '../models/user_settings.dart';
 import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/sticker.dart';
+import '../config/legal_urls.dart';
 import '../data/pro_exercises_seed.dart';
 import '../services/auth_service.dart';
 import '../services/exercise_history.dart';
@@ -406,6 +408,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     weight: FontWeight.w700,
                     color: AppColors.ink,
                   )),
+            ),
+            const SizedBox(height: 24),
+            _sectionTitle('Legal'),
+            const SizedBox(height: 8),
+            _LegalLink(
+              label: 'Privacy Policy',
+              icon: Icons.privacy_tip_outlined,
+              url: LegalUrls.privacyPolicy,
+            ),
+            const SizedBox(height: 10),
+            _LegalLink(
+              label: 'Impressum',
+              icon: Icons.description_outlined,
+              url: LegalUrls.impressum,
             ),
           ],
         ),
@@ -923,6 +939,53 @@ class _GroupDebugButtons extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _LegalLink extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final String url;
+  const _LegalLink({
+    required this.label,
+    required this.icon,
+    required this.url,
+  });
+
+  Future<void> _open() async {
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _open,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.ink, width: 2.5),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.ink, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(label,
+                  style: grotesk(
+                    size: 14,
+                    weight: FontWeight.w700,
+                    color: AppColors.ink,
+                  )),
+            ),
+            Icon(Icons.open_in_new,
+                size: 16, color: AppColors.textFaint),
+          ],
+        ),
+      ),
     );
   }
 }
