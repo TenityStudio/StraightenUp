@@ -410,6 +410,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   )),
             ),
             const SizedBox(height: 24),
+            AnimatedBuilder(
+              animation: AuthService.instance,
+              builder: (_, _) => AuthService.instance.hasRealAccount
+                  ? _DeleteAccountButton()
+                  : const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 24),
             _sectionTitle('Legal'),
             const SizedBox(height: 8),
             _LegalLink(
@@ -986,6 +993,118 @@ class _LegalLink extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DeleteAccountButton extends StatelessWidget {
+  Future<void> _confirm(BuildContext context) async {
+    final passwordController = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (d) => AlertDialog(
+        backgroundColor: AppColors.cream,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppColors.ink, width: 2.5),
+        ),
+        title: Text('Delete account?', style: anton(size: 22, height: 1)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Wir löschen deinen Account, alle deine Firestore-Daten und '
+              'die Verknüpfung zu deinem Pro-Abo aus unserer Datenbank.\n\n'
+              'Diese Aktion kann nicht rückgängig gemacht werden.',
+              style: grotesk(
+                  size: 13,
+                  color: AppColors.textMuted,
+                  weight: FontWeight.w500,
+                  height: 1.4),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.ink, width: 2),
+              ),
+              child: TextField(
+                controller: passwordController,
+                obscureText: true,
+                style: grotesk(size: 14, weight: FontWeight.w700),
+                cursorColor: AppColors.coral,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Passwort zur Bestätigung',
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(d, false),
+            child: Text('Cancel',
+                style: grotesk(color: AppColors.textFaint)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(d, true),
+            child: Text('DELETE',
+                style: grotesk(
+                    color: AppColors.coralDeep,
+                    weight: FontWeight.w800,
+                    letterSpacing: 1.4)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+
+    try {
+      await AuthService.instance.deleteAccount(
+        password: passwordController.text.isNotEmpty
+            ? passwordController.text
+            : null,
+      );
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.ink,
+          content: Text('Account gelöscht.',
+              style: grotesk(
+                  color: AppColors.cream, weight: FontWeight.w600)),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: AppColors.coralDeep,
+          content: Text('Löschen fehlgeschlagen: $e',
+              style: grotesk(
+                  color: AppColors.cream, weight: FontWeight.w600)),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StickerButton(
+      onPressed: () => _confirm(context),
+      fill: AppColors.white,
+      radius: 16,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Text('DELETE ACCOUNT',
+          style: grotesk(
+            size: 14,
+            weight: FontWeight.w800,
+            color: AppColors.coralDeep,
+            letterSpacing: 1.4,
+          )),
     );
   }
 }

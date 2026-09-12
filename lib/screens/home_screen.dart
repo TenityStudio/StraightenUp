@@ -505,6 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (_, _) => _TodayStatsRow(
                       calls: CallLog.instance.callsToday,
                       aced: CallLog.instance.acedToday,
+                      streak: CallLog.instance.currentStreak,
                       accent:
                           inLobby ? AppColors.purple : AppColors.amber,
                     ),
@@ -870,17 +871,19 @@ class _GroupModeBanner extends StatelessWidget {
 class _TodayStatsRow extends StatelessWidget {
   final int calls;
   final int aced;
+  final int streak;
   final Color accent;
   const _TodayStatsRow({
     required this.calls,
     required this.aced,
+    required this.streak,
     required this.accent,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(14),
@@ -890,7 +893,7 @@ class _TodayStatsRow extends StatelessWidget {
         children: [
           Expanded(
             child: _MiniStat(
-                number: '$calls', label: 'calls today', color: AppColors.ink),
+                number: '$calls', label: 'today', color: AppColors.ink),
           ),
           Container(
               width: 1.5,
@@ -899,8 +902,47 @@ class _TodayStatsRow extends StatelessWidget {
           Expanded(
             child: _MiniStat(number: '$aced', label: 'aced', color: accent),
           ),
+          Container(
+              width: 1.5,
+              height: 34,
+              color: AppColors.ink.withValues(alpha: 0.15)),
+          Expanded(
+            child: _StreakStat(streak: streak),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _StreakStat extends StatelessWidget {
+  final int streak;
+  const _StreakStat({required this.streak});
+  @override
+  Widget build(BuildContext context) {
+    final active = streak > 0;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(active ? '🔥' : '💤',
+            style: const TextStyle(fontSize: 20)),
+        const SizedBox(width: 4),
+        Text('$streak',
+            style: anton(
+              size: 26,
+              height: 1,
+              color: active ? AppColors.coralDeep : AppColors.textFaint,
+            )),
+        const SizedBox(width: 6),
+        Text(streak == 1 ? 'day' : 'days',
+            style: grotesk(
+              size: 12,
+              color: AppColors.textMuted,
+              weight: FontWeight.w600,
+            )),
+      ],
     );
   }
 }

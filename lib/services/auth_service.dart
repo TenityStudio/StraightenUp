@@ -159,4 +159,40 @@ class AuthService extends ChangeNotifier {
     await _ensureUserDoc();
     notifyListeners();
   }
+
+  /// Löscht Account vollständig — Firebase Auth + Firestore-Docs.
+  /// Danach wird ein frischer anonymer User erzeugt (App bleibt nutzbar).
+  ///
+  /// Für neu-authentifizierte User erforderlich — falls Firebase `requires-
+  /// recent-login` wirft, muss der User erst mit dem Password neu einloggen,
+  /// dann kann gelöscht werden.
+  Future<void> deleteAccount({String? password}) async {
+    final u = _user;
+    if (u == null) return;
+
+    // Wenn User nicht kürzlich eingeloggt war → re-authentifizieren mit
+    // dem eingegebenen Passwort.
+    if (password != null && u.email != null && !u.isAnonymous) {
+      final cred = EmailAuthProvider.credential(
+          email: u.email!, password: password);
+      await u.reauthenticateWithCredential(cred);
+    }
+
+    // Firestore-User-Doc löschen (falls existiert). Fehler ignorieren — Auth-
+    // Delete ist wichtiger und Firestore-TTL/Cleanup kann Reste später holen.
+    try {
+      await _db.collection('users').doc(u.uid).delete();
+    } catch (e) {
+      debugPrint('user doc delete failed: $e');
+    }
+
+    // Firebase Auth Löschen
+    await u.delete();
+
+    // Frischen anonymen User starten (damit App weiterläuft).
+    final cred = await _auth.signInAnonymously();
+    _user = cred.user;
+    await _ensureUserDoc();
+    notifyListeners();
+  }
 }

@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:ui';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -22,34 +26,53 @@ import 'theme/app_theme.dart';
 import 'theme/palettes.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
-  // Kritisch für UI (schnell, rein lokal):
-  final settings = await UserSettings.load();
-  await ThemeStore.init();
-  await CallLog.init();
-  await SurveyStore.init();
+  // Alle unerwarteten Errors sollen an Crashlytics geliefert werden.
+  // runZonedGuarded fängt async-Errors außerhalb des Flutter-Frameworks.
+  await runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
+    final settings = await UserSettings.load();
+    await ThemeStore.init();
+    await CallLog.init();
+    await SurveyStore.init();
 
-  // Firebase-Init MUSS vor allen anderen Firebase-Aufrufen kommen, aber
-  // Firestore-Reads/Auth-Setup laufen danach im Hintergrund weiter, damit
-  // main() nicht bei jedem Cold-Start auf Netzwerk wartet und ANR triggert.
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  unawaited(AuthService.instance.init());
-  await LobbyStore.init(); // legt nur die Instanz an, Restore läuft async
-  await RemoteExerciseStore.init(); // cached sofort, refreshed async
-  await ExerciseHistory.init();
-  unawaited(SubscriptionService.instance.init()); // still-fail wenn nicht konfiguriert
-  unawaited(NotificationService.instance.init());
-  unawaited(FcmService.instance.init());
+    // Firebase-Init MUSS vor allen anderen Firebase-Aufrufen kommen.
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  runApp(StraightGuysApp(settings: settings));
+    // Crashlytics: nur in Release-Builds automatisch senden. Im Debug-Build
+    // trotzdem erlauben (kann manuell getestet werden), aber standardmäßig aus.
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+    FlutterError.onError =
+        FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance
+          .recordError(error, stack, fatal: true);
+      return true;
+    };
+
+    // Analytics: session start beim App-Boot mitloggen.
+    FirebaseAnalytics.instance.logAppOpen();
+
+    unawaited(AuthService.instance.init());
+    await LobbyStore.init(); // legt nur die Instanz an, Restore läuft async
+    await RemoteExerciseStore.init(); // cached sofort, refreshed async
+    await ExerciseHistory.init();
+    unawaited(SubscriptionService.instance.init());
+    unawaited(NotificationService.instance.init());
+    unawaited(FcmService.instance.init());
+
+    runApp(StraightGuysApp(settings: settings));
+  }, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
 }
 
 class StraightGuysApp extends StatelessWidget {

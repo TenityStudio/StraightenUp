@@ -110,6 +110,73 @@ class CallLog extends ChangeNotifier {
   int get acedToday =>
       today.where((e) => e.result == CallResult.aced).length;
 
+  /// Aktueller Streak in Tagen.
+  ///
+  /// Zählt zurück von heute (bzw. gestern falls heute noch kein Ace) und
+  /// zählt jeden Tag, an dem mind. 1 Ace vorhanden ist. Bricht bei erstem
+  /// Tag ohne Ace ab. Ein Tag ohne jegliche Einträge wird auch als Bruch
+  /// gewertet — außer heute (Grace Period bis der erste Call kommt).
+  int get currentStreak {
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+
+    int streak = 0;
+    var day = todayDate;
+
+    // Heute checken
+    final todayAced =
+        _entries.where((e) => _sameDay(e.time, day) && e.result == CallResult.aced).length;
+    final todayHasEntries =
+        _entries.any((e) => _sameDay(e.time, day));
+
+    if (todayAced > 0) {
+      streak = 1;
+      day = day.subtract(const Duration(days: 1));
+    } else if (todayHasEntries) {
+      // Heute Calls empfangen aber keinen geaced → Streak schon gebrochen
+      return 0;
+    } else {
+      // Heute noch keine Calls empfangen → Grace, wir zählen von gestern
+      day = day.subtract(const Duration(days: 1));
+    }
+
+    // Rückwärts zählen
+    while (true) {
+      final dayEntries =
+          _entries.where((e) => _sameDay(e.time, day)).toList(growable: false);
+      if (dayEntries.isEmpty) break;
+      final aced =
+          dayEntries.where((e) => e.result == CallResult.aced).length;
+      if (aced == 0) break;
+      streak++;
+      day = day.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
+
+  /// Längster jemals erreichter Streak.
+  int get bestStreak {
+    if (_entries.isEmpty) return 0;
+    final acedDays = <DateTime>{};
+    for (final e in _entries) {
+      if (e.result != CallResult.aced) continue;
+      acedDays.add(DateTime(e.time.year, e.time.month, e.time.day));
+    }
+    if (acedDays.isEmpty) return 0;
+    final sorted = acedDays.toList()..sort();
+    int best = 1, run = 1;
+    for (int i = 1; i < sorted.length; i++) {
+      final diff = sorted[i].difference(sorted[i - 1]).inDays;
+      if (diff == 1) {
+        run++;
+        if (run > best) best = run;
+      } else if (diff > 1) {
+        run = 1;
+      }
+    }
+    return best;
+  }
+
   /// Fasst die letzten [days] Tage (endet heute, ältester Eintrag zuerst) zu
   /// je einer Kachel-Status-Kategorie zusammen.
   List<DaySummary> summaryOfLastDays(int days) {
